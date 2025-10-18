@@ -38,8 +38,8 @@ CharacterShortcutEvent customSlashCommand(
   Set<String> supportSlashMenuNodeTypes = _defaultSupportSlashMenuNodeTypes,
 }) {
   return CharacterShortcutEvent(
-    key: 'show the # menu',
-    character: '#',
+    key: 'show the \\ menu',
+    character: '\\',
     handler: (editorState) => _showSlashMenu(
       editorState,
       items,
