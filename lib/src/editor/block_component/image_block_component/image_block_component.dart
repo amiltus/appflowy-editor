@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cladbe_shared/cladbe_shared.dart' hide Node;
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:shimmer/shimmer.dart';
 
 class ImageBlockKeys {
   const ImageBlockKeys._();
@@ -255,28 +256,23 @@ class ImageBlockComponentWidgetState extends State<ImageBlockComponentWidget>
       child = Stack(
         alignment: Alignment.center,
         children: [
-          child,
-          Container(
-            width: width,
-            height: height ?? 300,
-            color: Colors.black.withOpacity(0.5),
-            child: const Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircularProgressIndicator(
-                  strokeWidth: 3,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
-                SizedBox(height: 12),
-                Text(
-                  "Uploading...",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
+          // Dim the image/video to make shimmer visible
+          ColorFiltered(
+            colorFilter: ColorFilter.mode(
+              Colors.black.withOpacity(0.8),
+              BlendMode.darken,
+            ),
+            child: child,
+          ),
+
+          // BEAUTIFUL SHIMMER OVERLAY
+          Positioned.fill(
+            child: Shimmer.fromColors(
+              baseColor: Colors.white.withOpacity(0.25),
+              highlightColor: Colors.white.withOpacity(0.55),
+              child: Container(
+                color: Colors.white.withOpacity(0.15),
+              ),
             ),
           ),
         ],
