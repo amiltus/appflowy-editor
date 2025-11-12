@@ -207,7 +207,7 @@ class ImageBlockComponentWidgetState extends State<ImageBlockComponentWidget>
                     constraints: BoxConstraints(
                       maxWidth: width,
                       maxHeight:
-                          height ?? MediaQuery.of(context).size.height * 0.6,
+                          height ?? MediaQuery.of(context).size.height * 0.4,
                     ),
                     child: ResizableImage(
                       document: appDocument,
@@ -411,36 +411,88 @@ class ImageBlockComponentWidgetState extends State<ImageBlockComponentWidget>
   }
 
   void _showPdfPopup(BuildContext context, Node node, AppDocument document) {
-    final noteData = _getNoteDataFromNode(node);
-    var popup = Provider.of<PopupProvider>(context, listen: false)
-        .pushPopupStack = Popup(
-      id: 'image-popup',
-      element: Align(
+    final isVideo = _isVideo(document);
+
+    Provider.of<PopupProvider>(context, listen: false).pushPopupStack = Popup(
+      id: 'media-popup',
+      barrierDismissible: true,
+      element: Stack(
         alignment: Alignment.center,
-        child: GestureDetector(
-          onTap: () {
-            Provider.of<PopupProvider>(context, listen: false).popPopupStack();
-          },
-          child: Container(
-            // height: MediaQuery.of(context).size.height * 0.8,
-            // width: MediaQuery.of(context).size.width * 0.7,
-            color: Colors.black12.withOpacity(0.8),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: InteractiveViewer(
-                minScale: 0.5,
-                maxScale: 4.0,
-                child: FileDisplay(
-                  alignment: Alignment.center,
-                  document: document,
-                  preview: false,
+        children: [
+          // ✅ Full-screen dark overlay — always clickable
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () {
+              Provider.of<PopupProvider>(context, listen: false)
+                  .popPopupStack();
+            },
+            child: Container(
+              color: Colors.black.withOpacity(0.75),
+            ),
+          ),
+
+          // ✅ Centered media content (image or video)
+          Center(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final maxWidth = constraints.maxWidth * 0.9;
+                final maxHeight = constraints.maxHeight * 0.9;
+
+                double aspectRatio = 16 / 9;
+
+                final child = AspectRatio(
+                  aspectRatio: aspectRatio,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: FileDisplay(
+                      document: document,
+                      preview: false,
+                      fit: BoxFit.contain, // ✅ maintains aspect ratio
+                    ),
+                  ),
+                );
+
+                return ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: maxWidth,
+                    maxHeight: maxHeight,
+                  ),
+                  child: InteractiveViewer(
+                    minScale: 0.5,
+                    maxScale: 3.0,
+                    clipBehavior: Clip.none,
+                    child: child,
+                  ),
+                );
+              },
+            ),
+          ),
+
+          // ✅ Optional close icon (top-right corner)
+          Positioned(
+            top: 24,
+            right: 24,
+            child: GestureDetector(
+              onTap: () {
+                Provider.of<PopupProvider>(context, listen: false)
+                    .popPopupStack();
+              },
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.6),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.close_rounded,
+                  color: Colors.white,
+                  size: 22,
                 ),
               ),
             ),
           ),
-        ),
+        ],
       ),
-      barrierDismissible: true,
     );
   }
 
