@@ -412,29 +412,36 @@ class ImageBlockComponentWidgetState extends State<ImageBlockComponentWidget>
 
   void _showPdfPopup(BuildContext context, Node node, AppDocument document) {
     final noteData = _getNoteDataFromNode(node);
-    var popup = Popup(
-      id: '1',
-      onDismiss: () {
-        Provider.of<PopupProvider>(context, listen: false).popPopupStack();
-      },
-      element: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Center(
-          child: SizedBox(
-            height: MediaQuery.of(context).size.height * 0.8,
-            width: MediaQuery.of(context).size.width * 0.32,
-            child: FileDisplay(
-              document: document,
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width - 200,
-              preview: false,
+    var popup = Provider.of<PopupProvider>(context, listen: false)
+        .pushPopupStack = Popup(
+      id: 'image-popup',
+      element: Align(
+        alignment: Alignment.center,
+        child: GestureDetector(
+          onTap: () {
+            Provider.of<PopupProvider>(context, listen: false).popPopupStack();
+          },
+          child: Container(
+            // height: MediaQuery.of(context).size.height * 0.8,
+            // width: MediaQuery.of(context).size.width * 0.7,
+            color: Colors.black12.withOpacity(0.8),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: InteractiveViewer(
+                minScale: 0.5,
+                maxScale: 4.0,
+                child: FileDisplay(
+                  alignment: Alignment.center,
+                  document: document,
+                  preview: false,
+                ),
+              ),
             ),
           ),
         ),
       ),
       barrierDismissible: true,
     );
-    Provider.of<PopupProvider>(context, listen: false).pushPopupStack = popup;
   }
 
   dynamic _getNoteDataFromNode(Node node) {
